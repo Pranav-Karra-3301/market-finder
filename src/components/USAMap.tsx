@@ -1,11 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { HiLocationMarker } from 'react-icons/hi';
 import { states } from '@/data/states';
-import { useMarketStore } from '@/store/useMarketStore';
 
-export default function USAMap() {
-  const { selectedState, setState } = useMarketStore();
+interface USAMapProps {
+  selectedState: string;
+  onStateSelect: (stateCode: string) => void;
+}
+
+export default function USAMap({ selectedState, onStateSelect }: USAMapProps) {
   const [svgContent, setSvgContent] = useState<string>('');
 
   useEffect(() => {
@@ -16,18 +20,18 @@ export default function USAMap() {
       .catch(error => console.error('Error loading SVG:', error));
   }, []);
 
-  const getStateByCode = (code: string) => {
+  const getStateByCode = useCallback((code: string) => {
     return states.find(state => state.code === code);
-  };
+  }, []);
 
-  const handleStateClick = (stateCode: string) => {
+  const handleStateClick = useCallback((stateCode: string) => {
     const state = getStateByCode(stateCode);
     if (state?.licensed) {
-      setState(stateCode as 'CA' | 'TX' | 'AZ');
+      onStateSelect(stateCode);
     }
-  };
+  }, [getStateByCode, onStateSelect]);
 
-  const getStateStyle = (stateCode: string) => {
+  const getStateStyle = useCallback((stateCode: string) => {
     const state = getStateByCode(stateCode);
     
     if (!state?.licensed) {
@@ -40,7 +44,7 @@ export default function USAMap() {
     
     if (selectedState === stateCode) {
       return {
-        fill: '#1e40af', // blue-700
+        fill: '#5A67D8', // accent color
         cursor: 'pointer'
       };
     }
@@ -49,7 +53,7 @@ export default function USAMap() {
       fill: '#60a5fa', // blue-400
       cursor: 'pointer'
     };
-  };
+  }, [getStateByCode, selectedState]);
 
   useEffect(() => {
     if (!svgContent) return;
@@ -67,6 +71,7 @@ export default function USAMap() {
         
         // Apply styles
         Object.assign((path as HTMLElement).style, style);
+        (path as HTMLElement).classList.add('map-state-hover');
         
         // Add hover effects
         const state = getStateByCode(stateCode);
@@ -86,10 +91,15 @@ export default function USAMap() {
       }
     });
 
-    // Update the SVG content in the DOM
+    // Update the SVG content in the DOM with proper sizing
     const mapContainer = document.getElementById('usa-map-container');
     if (mapContainer) {
-      mapContainer.innerHTML = svgDoc.documentElement.outerHTML;
+      const svgElement = svgDoc.documentElement;
+      // Desktop-first sizing
+      svgElement.setAttribute('width', '800');
+      svgElement.setAttribute('height', '500');
+      svgElement.setAttribute('style', 'max-width: 100%; height: auto;');
+      mapContainer.innerHTML = svgElement.outerHTML;
       
       // Re-add event listeners after DOM update
       const newPaths = mapContainer.querySelectorAll('path[id^="US-"]');
@@ -101,37 +111,36 @@ export default function USAMap() {
         }
       });
     }
-  }, [svgContent, selectedState]);
+  }, [svgContent, selectedState, getStateStyle, getStateByCode, handleStateClick]);
 
   return (
-    <div className="w-full max-w-6xl mx-auto">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Market Finder</h1>
-        <p className="text-lg text-gray-600">
-          Please click on a state in the map below to get more information on your specific business need
-        </p>
-      </div>
+    <div className="w-full">
+      {/* Selected State Label - above map */}
+      {selectedState && (
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-gray-900 rounded-lg font-medium shadow-sm">
+            <HiLocationMarker className="w-5 h-5 mr-2 text-gray-600" />
+            Selected: {getStateByCode(selectedState)?.name}
+          </div>
+        </div>
+      )}
 
-      <div className="bg-white rounded-xl shadow-lg p-8">
+      {/* Map Container */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div 
           id="usa-map-container"
-          className="w-full flex justify-center"
-          style={{ minHeight: '400px' }}
+          className="w-full flex justify-center py-20 px-12"
+          style={{ minHeight: '540px' }}
         >
           {!svgContent && (
             <div className="flex items-center justify-center h-96">
-              <div className="text-gray-500">Loading map...</div>
+              <div className="flex items-center space-x-3">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="text-gray-500 font-medium">Loading interactive map...</span>
+              </div>
             </div>
           )}
         </div>
-        
-        {selectedState && (
-          <div className="mt-6 text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full">
-              <span className="font-semibold">Selected: {getStateByCode(selectedState)?.name}</span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

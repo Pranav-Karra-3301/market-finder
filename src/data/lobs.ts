@@ -1,4 +1,4 @@
-export const LOBs = {
+export const lobs = {
   Personal: [
     'Classic Car',
     'Condominium',
