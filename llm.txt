@@ -1,0 +1,537 @@
+# Market Finder - Comprehensive LLM Documentation
+
+## PROJECT OVERVIEW
+
+Market Finder is a Next.js-based insurance carrier discovery tool that helps users find available insurance carriers in licensed US states. The application provides an interactive experience where users select a state, choose their business type (Personal or Commercial), select an insurance product, and view matching carriers.
+
+**Core Purpose**: Insurance carrier discovery and comparison tool
+**Current Licensed States**: California (CA), Texas (TX), Arizona (AZ)
+**Domain**: Insurance technology, carrier marketplace
+**Target Users**: Insurance agents, brokers, and end consumers seeking coverage
+
+---
+
+## TECHNICAL ARCHITECTURE
+
+### Framework & Runtime
+- **Framework**: Next.js 15.4.2 (App Router)
+- **React Version**: 19.1.0
+- **TypeScript**: v5 with strict mode enabled
+- **Node.js**: Compatible with current LTS versions
+- **Package Manager**: npm (package-lock.json present)
+
+### Styling & UI
+- **CSS Framework**: Tailwind CSS v4 (latest)
+- **Font**: Inter (Google Fonts) with custom CSS properties
+- **Icons**: React Icons v5.5.0
+- **Animations**: Framer Motion v12.23.6
+- **Design System**: Custom CSS variables and component classes
+
+### Build & Development
+- **Bundler**: Next.js built-in (Webpack-based)
+- **SVG Handling**: @svgr/webpack for SVG imports
+- **Linting**: ESLint with Next.js config
+- **PostCSS**: Autoprefixer included
+
+---
+
+## FILE STRUCTURE ANALYSIS
+
+```
+market-finder/
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── layout.tsx         # Root layout with header/metadata
+│   │   ├── page.tsx           # Main homepage component
+│   │   └── favicon.ico        # Site favicon
+│   ├── components/            # Reusable React components
+│   │   ├── USAMap.tsx         # Interactive SVG map component
+│   │   ├── ProductDropdown.tsx # Insurance product selector
+│   │   ├── CarrierList.tsx    # Carrier results display
+│   │   └── CarrierCard.tsx    # Individual carrier card [UNUSED]
+│   ├── data/                  # Static data sources
+│   │   ├── carriers.ts        # Insurance carrier database
+│   │   ├── lobs.ts           # Lines of business by type
+│   │   └── states.ts         # US states with licensing info
+│   ├── types/                 # TypeScript type definitions
+│   │   └── market.d.ts       # Core domain types
+│   ├── lib/                   # Utility functions
+│   │   └── helpers.ts        # String utilities (slugify, groupBy)
+│   ├── styles/               # Global CSS
+│   │   └── globals.css       # Tailwind + custom styles
+│   └── store/                # [EMPTY] - State management directory
+├── public/                    # Static assets
+│   ├── icons/                # Icon images
+│   ├── state_flags/          # US state flag images (50 states)
+│   ├── usa.svg              # Interactive US map SVG
+│   ├── logo.png             # App logo
+│   └── preview.png          # OG preview image
+├── Configuration Files
+│   ├── package.json         # Dependencies and scripts
+│   ├── tsconfig.json        # TypeScript configuration
+│   ├── tailwind.config.ts   # Tailwind CSS settings
+│   ├── next.config.ts       # Next.js configuration
+│   ├── postcss.config.mjs   # PostCSS settings
+│   └── eslint.config.mjs    # ESLint rules
+```
+
+---
+
+## CORE DATA MODELS
+
+### TypeScript Types (`src/types/market.d.ts`)
+
+```typescript
+export interface State {
+  code: string;        // ISO 2-letter state code (e.g., "CA")
+  name: string;        // Full state name (e.g., "California")
+  licensed: boolean;   // Whether the company is licensed in this state
+}
+
+export interface Carrier {
+  id: string;          // Unique identifier (kebab-case)
+  name: string;        // Display name (e.g., "State Farm")
+  states: string[];    // Array of ISO state codes where available
+  lines: string[];     // Insurance products offered (e.g., "Personal Auto")
+  tags: string[];      // Distribution channels ("Online", "Offline")
+  logo?: string;       // Optional logo image path
+}
+
+export type BusinessType = 'Personal' | 'Commercial';
+```
+
+### Data Sources
+
+#### States (`src/data/states.ts`)
+- **Purpose**: Defines all 50 US states with licensing status
+- **Licensed States**: Only CA, TX, AZ have `licensed: true`
+- **Usage**: Map display, state validation, UI filtering
+
+#### Carriers (`src/data/carriers.ts`)
+- **Count**: 22 insurance carriers
+- **Distribution**: Online vs Offline channel tags
+- **Coverage**: Various combinations across CA, TX, AZ
+- **Notable Carriers**: State Farm, GEICO, Progressive, Allstate, Nationwide
+
+#### Lines of Business (`src/data/lobs.ts`)
+```typescript
+Personal: [
+  'Classic Car', 'Condominium', 'Dwelling Fire', 'Earthquake',
+  'Flood', 'Homeowners', 'Jewelry', 'Motorcycle', 
+  'Personal Auto', 'Personal Umbrella', 'Personal Watercraft', 'Renters'
+]
+
+Commercial: [
+  'General Liability', 'Workers Compensation', 'Commercial Auto',
+  'Commercial Property', 'Professional Liability', 'Cyber Liability'
+]
+```
+
+---
+
+## COMPONENT ARCHITECTURE
+
+### Main Page (`src/app/page.tsx`)
+**Complexity**: High (237 lines)
+**Responsibilities**:
+- URL state management with URLSearchParams
+- Multi-step form flow orchestration
+- Smooth scrolling between sections
+- Conditional rendering based on user progress
+
+**State Flow**:
+1. User selects state → URL: `?state=CA`
+2. User selects business type → URL: `?state=CA&type=Personal`
+3. User selects LOB → URL: `?state=CA&type=Personal&lob=Personal%20Auto`
+4. Results display automatically
+
+**Key Features**:
+- Automatic smooth scrolling to next section
+- URL-based state (shareable links)
+- Responsive dropdown spacing calculations
+- Progressive disclosure UX pattern
+
+### Interactive Map (`src/components/USAMap.tsx`)
+**Complexity**: Medium (172 lines)
+**Responsibilities**:
+- Load and manipulate SVG map dynamically
+- Handle state click events with validation
+- Apply dynamic styling based on licensing status
+- Show selected state with flag and name
+
+**Technical Implementation**:
+- Fetches `/usa.svg` on component mount
+- Uses DOMParser to manipulate SVG elements
+- Applies event listeners to individual state paths
+- CSS-in-JS styling for hover/selection states
+
+### Product Dropdown (`src/components/ProductDropdown.tsx`)
+**Complexity**: Medium (94 lines)
+**Responsibilities**:
+- Display business-type-specific LOB options
+- Handle dropdown open/close state
+- Communicate state changes to parent for scrolling
+- Accessible dropdown implementation
+
+### Carrier Results (`src/components/CarrierList.tsx`)
+**Complexity**: High (271 lines)
+**Responsibilities**:
+- Filter carriers by state, business type, and LOB
+- Group results by Online/Offline distribution
+- Provide inline filter controls for easy modification
+- Display carrier cards with logo and coverage info
+
+**Data Flow**:
+```
+User Selections → Filter Logic → Grouped Results → UI Rendering
+selectedState + businessType + selectedLOB → carriers.filter() → { online: [], offline: [] } → CarrierGrid
+```
+
+---
+
+## URL STATE MANAGEMENT
+
+The application uses URL parameters for state management, making the app bookmarkable and shareable:
+
+**URL Pattern**: `/?state={STATE}&type={BUSINESS_TYPE}&lob={LOB}`
+**Example**: `/?state=CA&type=Personal&lob=Personal%20Auto`
+
+**Benefits**:
+- Shareable links to specific search results
+- Browser back/forward navigation works correctly
+- Refresh maintains user state
+- Deep linking support
+
+**Implementation**:
+- `useSearchParams()` for reading URL state
+- `router.push()` for updating URL without page reload
+- `scroll: false` to prevent default browser scrolling
+- Custom smooth scrolling implementation
+
+---
+
+## STYLING SYSTEM
+
+### Design Tokens (`src/styles/globals.css`)
+```css
+:root {
+  --color-charcoal: #1F2937;
+  --color-light-gray: #F9FAFB;
+  --color-accent: #5A67D8;
+  --color-white: #FFFFFF;
+}
+```
+
+### Typography
+- **Font**: Inter with optimized font features
+- **Weight Scale**: 300-900 available
+- **Letter Spacing**: Custom negative values for modern look
+- **Font Features**: `cv02`, `cv03`, `cv04`, `cv11` (stylistic sets)
+
+### Component Classes
+- `.clean-card`: Standard card container with shadow/border
+- `.control-card`: Form section with gray background
+- `.custom-select`: Styled dropdown button
+- `.accent-border`: Blue border for selected states
+- `.hover-scale`: Subtle hover animation (1.02x scale)
+- `.ghost-button`: Notion-style minimal buttons
+
+### Responsive Strategy
+- **Desktop-first**: Optimized for large screens
+- **Mobile adaptations**: Responsive grid systems
+- **Breakpoints**: Tailwind's standard lg (1024px) primarily used
+
+---
+
+## USER EXPERIENCE FLOW
+
+### Step-by-Step Journey
+1. **Landing**: User sees hero text + full USA map
+2. **State Selection**: Click licensed state (CA/TX/AZ) → scroll to business type
+3. **Business Type**: Choose Personal/Commercial → scroll to product dropdown
+4. **Product Selection**: Choose insurance LOB → scroll to results
+5. **Results**: View carriers grouped by Online/Offline with filter controls
+
+### Interaction Patterns
+- **Progressive Disclosure**: Only show next step when previous is complete
+- **Smart Scrolling**: Automatically scroll to next section with proper spacing
+- **Visual Feedback**: Selected states highlighted, checkmarks on completed steps
+- **Error Prevention**: Only licensed states are clickable, invalid selections disabled
+
+### Accessibility Features
+- **ARIA Labels**: Dropdown buttons have proper ARIA attributes
+- **Keyboard Navigation**: Dropdowns work with keyboard
+- **Focus Management**: Proper focus rings and transitions
+- **Screen Reader Support**: Semantic HTML structure
+
+---
+
+## BUSINESS LOGIC
+
+### Carrier Filtering Algorithm
+```typescript
+// Primary filter by state and LOB
+const availableCarriers = carriers.filter(carrier => 
+  carrier.states.includes(selectedState) && 
+  carrier.lines.includes(selectedLOB)
+);
+
+// Secondary grouping by distribution channel
+const onlineCarriers = availableCarriers.filter(carrier => 
+  carrier.tags.includes('Online')
+);
+
+const offlineCarriers = availableCarriers.filter(carrier => 
+  carrier.tags.includes('Offline') && !carrier.tags.includes('Online')
+);
+```
+
+### State Validation
+- Only states with `licensed: true` are interactive
+- Non-licensed states show as gray and non-clickable
+- State flag images are dynamically loaded based on state code
+
+### URL Validation
+- Invalid state codes are handled gracefully
+- Missing parameters don't break the application
+- URL params are type-checked against business rules
+
+---
+
+## PERFORMANCE CONSIDERATIONS
+
+### Image Optimization
+- Next.js Image component for automatic optimization
+- State flags: 24x16px optimized PNGs
+- Logo and icons: Proper sizing declarations
+- Preview image: 1200x630px for social sharing
+
+### Bundle Optimization
+- Dynamic SVG loading (not bundled)
+- Tree-shaking with ES modules
+- React Icons only import used icons
+- Framer Motion loaded only when needed
+
+### Runtime Performance
+- Memoized functions with `useCallback`
+- Efficient array filtering operations
+- Minimal re-renders with proper dependency arrays
+- Debounced scroll events
+
+---
+
+## DEVELOPMENT WORKFLOW
+
+### Scripts (`package.json`)
+```json
+{
+  "dev": "next dev",         // Development server
+  "build": "next build",     // Production build
+  "start": "next start",     // Production server
+  "lint": "next lint"        // Code linting
+}
+```
+
+### Development Server
+- **Port**: 3000 (Next.js default)
+- **Hot Reload**: Enabled for all file types
+- **Fast Refresh**: React component state preserved during edits
+
+### Build Process
+- **Output**: `.next/` directory
+- **Static Optimization**: Automatic for pages without server-side logic
+- **Asset Optimization**: Images, CSS, JS automatically optimized
+
+---
+
+## API & DATA INTEGRATION
+
+### Current State: Static Data
+- All carrier data is statically defined in TypeScript files
+- No external API calls (fully client-side)
+- Data is imported as ES modules for tree-shaking
+
+### Future API Integration Points
+1. **Carrier Data**: `GET /api/carriers?state={state}&lob={lob}`
+2. **State Licensing**: `GET /api/states/licensing-status`
+3. **Real-time Availability**: `GET /api/carriers/{id}/availability`
+
+### Data Update Process
+To modify carriers or add new states:
+1. Edit `src/data/carriers.ts` for carrier information
+2. Edit `src/data/states.ts` to enable new states
+3. Add state flag images to `public/state_flags/`
+4. Update SVG map if new states added
+
+---
+
+## DEPLOYMENT & HOSTING
+
+### Production Configuration
+- **Domain**: market-finder.pranavkarra.me
+- **Protocol**: HTTPS required for geolocation features
+- **CDN**: Likely using Vercel Edge Network
+- **Environment**: Node.js compatible hosting
+
+### SEO & Social Sharing
+- **Open Graph**: Configured with preview image
+- **Twitter Cards**: Summary large image format
+- **Metadata**: Comprehensive title/description tags
+- **Sitemap**: Would be generated automatically by Next.js
+
+### Analytics Preparation
+- Google Search Console verification placeholder
+- Meta tags configured for tracking pixels
+- Performance monitoring ready for Web Vitals
+
+---
+
+## TESTING STRATEGY
+
+### Current Testing Gap
+- No test files present in codebase
+- No testing framework configured
+- Manual testing required for all features
+
+### Recommended Testing Approach
+1. **Unit Tests**: Jest + Testing Library for components
+2. **Integration Tests**: User flow testing with Playwright
+3. **Visual Tests**: Screenshot comparison for map interactions
+4. **Performance Tests**: Lighthouse CI for Core Web Vitals
+
+---
+
+## SECURITY CONSIDERATIONS
+
+### Client-Side Security
+- No sensitive data exposed (all carrier info is public)
+- No authentication required
+- No user data collection
+- XSS protection via React's built-in escaping
+
+### Data Privacy
+- No personal information collected
+- No cookies set
+- URL parameters only contain business selections
+- GDPR compliant by design (no tracking)
+
+---
+
+## BROWSER COMPATIBILITY
+
+### Target Browsers
+- **Desktop**: Chrome, Firefox, Safari, Edge (latest 2 versions)
+- **Mobile**: iOS Safari, Chrome Mobile, Samsung Internet
+- **Features Used**:
+  - CSS Grid & Flexbox
+  - URLSearchParams API
+  - Fetch API
+  - ES2017+ features
+
+### Progressive Enhancement
+- Core functionality works without JavaScript
+- Map interactions require JavaScript
+- Graceful fallbacks for older browsers
+
+---
+
+## KNOWN LIMITATIONS & TECHNICAL DEBT
+
+### Current Limitations
+1. **Limited State Coverage**: Only 3 states supported (CA, TX, AZ)
+2. **Static Data**: No real-time carrier availability
+3. **No User Accounts**: No personalization or saved searches
+4. **Mobile Map UX**: SVG map may be difficult on small screens
+5. **No Carrier Details**: Limited information per carrier
+
+### Technical Debt
+1. **Unused Components**: `CarrierCard.tsx` is present but not used
+2. **Empty Store Directory**: State management structure prepared but unused
+3. **Hard-coded Styling**: Some styles could be more systematic
+4. **Missing Error Handling**: Limited error boundaries and fallbacks
+
+### Refactoring Opportunities
+1. Extract map logic into custom hook
+2. Implement proper state management (Zustand/Redux)
+3. Add error boundaries for better user experience
+4. Optimize SVG map for mobile interactions
+5. Add loading states for better perceived performance
+
+---
+
+## FUTURE ENHANCEMENT ROADMAP
+
+### Phase 1: Core Improvements
+- Add more licensed states
+- Implement carrier detail pages
+- Add carrier comparison features
+- Mobile-optimized map interactions
+
+### Phase 2: Advanced Features
+- User accounts and saved searches
+- Real-time carrier availability API
+- Quote request functionality
+- Advanced filtering (rating, pricing)
+
+### Phase 3: Scale & Optimization
+- Multi-language support
+- Advanced analytics and tracking
+- A/B testing infrastructure
+- Performance monitoring dashboard
+
+---
+
+## TROUBLESHOOTING GUIDE
+
+### Common Development Issues
+
+**1. SVG Map Not Loading**
+- Check that `/public/usa.svg` exists
+- Verify fetch request in browser network tab
+- Ensure proper CORS headers if self-hosting
+
+**2. State Not Updating in URL**
+- Verify `useRouter` is used correctly
+- Check for JavaScript errors in console
+- Ensure Next.js App Router is properly configured
+
+**3. Styling Issues**
+- Run `npm run dev` to ensure Tailwind is compiling
+- Check for CSS specificity conflicts
+- Verify Inter font is loading correctly
+
+**4. TypeScript Errors**
+- Run `npx tsc --noEmit` to check types
+- Verify all imports are correct
+- Check that data files match type definitions
+
+### Performance Debugging
+- Use React DevTools Profiler
+- Check Lighthouse scores
+- Monitor bundle size with `npm run build`
+- Analyze with Next.js Bundle Analyzer
+
+---
+
+## CODE STYLE & CONVENTIONS
+
+### Naming Conventions
+- **Files**: PascalCase for components, camelCase for utilities
+- **Components**: PascalCase (e.g., `USAMap`, `CarrierList`)
+- **Functions**: camelCase (e.g., `handleStateSelect`)
+- **Constants**: UPPER_SNAKE_CASE for true constants
+- **Types**: PascalCase interfaces/types
+
+### Code Organization
+- One component per file
+- Related utilities in same directory
+- Export types from central location
+- Consistent import order (external, internal, relative)
+
+### Component Patterns
+- Functional components with hooks
+- Props interfaces defined inline or imported
+- Custom hooks for complex logic
+- Ref forwarding where appropriate
+
+This documentation provides a complete understanding of the Market Finder codebase, enabling any LLM to effectively understand, modify, and extend the application. 
