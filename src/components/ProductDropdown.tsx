@@ -9,9 +9,10 @@ interface ProductDropdownProps {
   businessType: BusinessType | '';
   selectedLOB: string;
   onLOBSelect: (lob: string) => void;
+  onDropdownToggle?: (isOpen: boolean) => void;
 }
 
-export default function ProductDropdown({ businessType, selectedLOB, onLOBSelect }: ProductDropdownProps) {
+export default function ProductDropdown({ businessType, selectedLOB, onLOBSelect, onDropdownToggle }: ProductDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -28,9 +29,20 @@ export default function ProductDropdown({ businessType, selectedLOB, onLOBSelect
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Notify parent when dropdown state changes
+  useEffect(() => {
+    if (onDropdownToggle) {
+      onDropdownToggle(isOpen);
+    }
+  }, [isOpen, onDropdownToggle]);
+
   const handleSelect = (product: string) => {
     onLOBSelect(product);
     setIsOpen(false);
+  };
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
   };
 
   if (!businessType) return null;
@@ -42,7 +54,7 @@ export default function ProductDropdown({ businessType, selectedLOB, onLOBSelect
       </label>
       
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleDropdown}
         className="custom-select flex items-center justify-between w-full"
         aria-haspopup="listbox"
         aria-expanded={isOpen}

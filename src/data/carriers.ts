@@ -8,7 +8,7 @@ export const carriers: Carrier[] = [
     states: ['CA', 'TX', 'AZ'],
     lines: ['Personal Auto', 'Homeowners'],
     tags: ['Online'],
-    logo: '/logos/national-general.png'
+    logo: '/icons/placeholder.png'
   },
   {
     id: 'safeco',
@@ -16,7 +16,7 @@ export const carriers: Carrier[] = [
     states: ['CA', 'TX', 'AZ'],
     lines: ['Personal Auto', 'Homeowners'],
     tags: ['Online'],
-    logo: '/logos/safeco.png'
+    logo: '/icons/placeholder.png'
   },
   {
     id: 'assurance-america',
@@ -24,7 +24,7 @@ export const carriers: Carrier[] = [
     states: ['CA', 'TX', 'AZ'],
     lines: ['Personal Auto'],
     tags: ['Online'],
-    logo: '/logos/assurance-america.png'
+    logo: '/icons/placeholder.png'
   },
   {
     id: 'nationwide',
@@ -32,7 +32,7 @@ export const carriers: Carrier[] = [
     states: ['CA', 'TX', 'AZ'],
     lines: ['Personal Auto', 'Homeowners'],
     tags: ['Online'],
-    logo: '/logos/nationwide.png'
+    logo: '/icons/placeholder.png'
   },
   {
     id: 'commonwealth-casualty',
@@ -40,7 +40,7 @@ export const carriers: Carrier[] = [
     states: ['CA', 'TX', 'AZ'],
     lines: ['Personal Auto'],
     tags: ['Online'],
-    logo: '/logos/commonwealth-casualty.png'
+    logo: '/icons/placeholder.png'
   },
   {
     id: 'elephant',
@@ -48,7 +48,7 @@ export const carriers: Carrier[] = [
     states: ['CA', 'TX', 'AZ'],
     lines: ['Personal Auto'],
     tags: ['Online'],
-    logo: '/logos/elephant.png'
+    logo: '/icons/placeholder.png'
   },
   {
     id: 'thirtyland',
@@ -56,7 +56,7 @@ export const carriers: Carrier[] = [
     states: ['CA', 'TX', 'AZ'],
     lines: ['Personal Auto'],
     tags: ['Online'],
-    logo: '/logos/thirtyland.png'
+    logo: '/icons/placeholder.png'
   },
   {
     id: 'clearcover',
@@ -64,7 +64,31 @@ export const carriers: Carrier[] = [
     states: ['CA', 'TX', 'AZ'],
     lines: ['Personal Auto'],
     tags: ['Online'],
-    logo: '/logos/clearcover.png'
+    logo: '/icons/placeholder.png'
+  },
+    {
+    id: 'abc-insurance',
+    name: 'ABC Insurance',
+    states: ['CA', 'TX', 'AZ'],
+    lines: ['Personal Auto', 'Renters'],
+    tags: ['Online'],
+    logo: '/icons/placeholder.png'
+  },
+  {
+    id: 'xyz-insurance',
+    name: 'XYZ Insurance',
+    states: ['CA', 'TX'],
+    lines: ['Homeowners'],
+    tags: ['Online'],
+    logo: '/icons/placeholder.png'
+  },
+  {
+    id: '123-insurance',
+    name: '123 Insurance',
+    states: ['AZ'],
+    lines: ['Personal Auto'],
+    tags: ['Online'],
+    logo: '/icons/placeholder.png'
   },
   
   // Offline carriers
@@ -74,7 +98,7 @@ export const carriers: Carrier[] = [
     states: ['TX', 'AZ'],
     lines: ['Personal Auto'],
     tags: ['Offline'],
-    logo: '/logos/gainsco.png'
+    logo: '/icons/placeholder.png'
   },
   {
     id: 'kemper-auto',
@@ -82,7 +106,15 @@ export const carriers: Carrier[] = [
     states: ['CA', 'TX'],
     lines: ['Personal Auto'],
     tags: ['Offline'],
-    logo: '/logos/kemper-auto.png'
+    logo: '/icons/placeholder.png'
+  },
+  {
+    id: 'farmers',
+    name: 'Farmers Insurance',
+    states: ['CA', 'AZ'],
+    lines: ['Homeowners', 'Personal Auto'],
+    tags: ['Offline'],
+    logo: '/icons/placeholder.png'
   },
 
   // Additional carriers for variety
@@ -92,7 +124,7 @@ export const carriers: Carrier[] = [
     states: ['CA', 'TX', 'AZ'],
     lines: ['Personal Auto', 'Homeowners', 'Renters'],
     tags: ['Online', 'Offline'],
-    logo: '/logos/state-farm.png'
+    logo: '/icons/placeholder.png'
   },
   {
     id: 'geico',
@@ -100,7 +132,7 @@ export const carriers: Carrier[] = [
     states: ['CA', 'TX'],
     lines: ['Personal Auto'],
     tags: ['Online'],
-    logo: '/logos/geico.png'
+    logo: '/icons/placeholder.png'
   },
   {
     id: 'progressive',
@@ -108,7 +140,7 @@ export const carriers: Carrier[] = [
     states: ['CA', 'TX', 'AZ'],
     lines: ['Personal Auto', 'Commercial Auto'],
     tags: ['Online'],
-    logo: '/logos/progressive.png'
+    logo: '/icons/placeholder.png'
   },
   {
     id: 'allstate',
@@ -116,6 +148,22 @@ export const carriers: Carrier[] = [
     states: ['CA', 'TX'],
     lines: ['Personal Auto', 'Homeowners'],
     tags: ['Online', 'Offline'],
-    logo: '/logos/allstate.png'
-  }
-]; 
+    logo: '/icons/placeholder.png'
+  },
+  {
+    id: 'mercury',
+    name: 'Mercury Insurance',
+    states: ['CA', 'TX', 'AZ'],
+    lines: ['Personal Auto', 'Homeowners'],
+    tags: ['Online', 'Offline'],
+    logo: '/icons/placeholder.png'
+  },
+  {
+    id: 'travelers',
+    name: 'Travelers',
+    states: ['CA', 'TX'],
+    lines: ['Personal Auto', 'Homeowners', 'Renters'],
+    tags: ['Online', 'Offline'],
+    logo: '/icons/placeholder.png'
+  },
+];

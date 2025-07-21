@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { HiLocationMarker } from 'react-icons/hi';
+import Image from 'next/image';
 import { states } from '@/data/states';
 
 interface USAMapProps {
@@ -34,8 +35,17 @@ export default function USAMap({ selectedState, onStateSelect }: USAMapProps) {
   const getStateStyle = useCallback((stateCode: string) => {
     const state = getStateByCode(stateCode);
     
+    // Base border styling for all states
+    const baseStyle = {
+      stroke: '#ffffff', // White borders between states
+      strokeWidth: '1', // Thin border width
+      strokeLinejoin: 'round' as const,
+      strokeLinecap: 'round' as const,
+    };
+    
     if (!state?.licensed) {
       return {
+        ...baseStyle,
         fill: '#e5e7eb', // gray-200
         cursor: 'not-allowed',
         opacity: 0.7
@@ -44,12 +54,16 @@ export default function USAMap({ selectedState, onStateSelect }: USAMapProps) {
     
     if (selectedState === stateCode) {
       return {
+        ...baseStyle,
+        stroke: '#1e40af', // Darker blue border for selected state
+        strokeWidth: '2', // Thicker border for selected state
         fill: '#5A67D8', // accent color
         cursor: 'pointer'
       };
     }
     
     return {
+      ...baseStyle,
       fill: '#60a5fa', // blue-400
       cursor: 'pointer'
     };
@@ -79,12 +93,16 @@ export default function USAMap({ selectedState, onStateSelect }: USAMapProps) {
           (path as HTMLElement).addEventListener('mouseenter', () => {
             if (selectedState !== stateCode) {
               (path as HTMLElement).style.fill = '#3b82f6'; // blue-500
+              (path as HTMLElement).style.stroke = '#e5e7eb'; // Light gray border on hover
+              (path as HTMLElement).style.strokeWidth = '1.5'; // Slightly thicker on hover
             }
           });
           
           (path as HTMLElement).addEventListener('mouseleave', () => {
             if (selectedState !== stateCode) {
               (path as HTMLElement).style.fill = '#60a5fa'; // blue-400
+              (path as HTMLElement).style.stroke = '#ffffff'; // White border back to normal
+              (path as HTMLElement).style.strokeWidth = '1'; // Normal thickness
             }
           });
         }
@@ -120,13 +138,20 @@ export default function USAMap({ selectedState, onStateSelect }: USAMapProps) {
         <div className="text-center mb-8">
           <div className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-gray-900 rounded-lg font-medium shadow-sm">
             <HiLocationMarker className="w-5 h-5 mr-2 text-gray-600" />
-            Selected: {getStateByCode(selectedState)?.name}
+            <Image
+              src={`/state_flags/${selectedState.toLowerCase()}.png`}
+              alt={`${getStateByCode(selectedState)?.name} flag`}
+              width={24}
+              height={16}
+              className="mr-2 rounded-sm border border-gray-200"
+            />
+             {getStateByCode(selectedState)?.name}
           </div>
         </div>
       )}
 
       {/* Map Container */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-lg overflow-hidden">
         <div 
           id="usa-map-container"
           className="w-full flex justify-center py-20 px-12"

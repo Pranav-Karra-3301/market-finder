@@ -13,6 +13,43 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Market Finder - Insurance Carrier Discovery",
   description: "Find available insurance carriers in licensed states (CA, TX, AZ)",
+  metadataBase: new URL('https://market-finder.pranavkarra.me'),
+  openGraph: {
+    title: "Market Finder - Insurance Carrier Discovery",
+    description: "Find available insurance carriers in licensed states (CA, TX, AZ)",
+    url: 'https://market-finder.pranavkarra.me',
+    siteName: 'Market Finder',
+    images: [
+      {
+        url: '/preview.png',
+        width: 1200,
+        height: 630,
+        alt: 'Market Finder - Insurance Carrier Discovery Tool',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Market Finder - Insurance Carrier Discovery",
+    description: "Find available insurance carriers in licensed states (CA, TX, AZ)",
+    images: ['/preview.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: '', // Add Google Search Console verification code if needed
+  },
 };
 
 export default function RootLayout({
@@ -22,18 +59,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className={`${inter.className} antialiased bg-gray-50`} style={{ fontFamily: 'Inter, system-ui, sans-serif', lineHeight: 1.5 }}>
+      <body className={`${inter.className} antialiased bg-white`} style={{ fontFamily: 'Inter, system-ui, sans-serif', lineHeight: 1.5 }}>
         <div className="min-h-screen flex flex-col">
           {/* Header */}
-          <header className="bg-white border-b border-gray-200">
+          <header className="bg-white">
             <div className="max-w-4xl mx-auto px-6 py-8">
               <div className="flex items-center justify-center space-x-4">
                 <Image
                   src="/logo.png"
                   alt="Market Finder Logo"
-                  width={48}
-                  height={48}
-                  className="rounded-xl shadow-sm"
+                  width={64}
+                  height={64}
+                  className=""
                 />
                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Market Finder</h1>
               </div>
